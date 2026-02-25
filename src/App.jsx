@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
   getCoordinates,
-  getCurrentWeather,
   getForecastAndHistorical,
   getMarineWeather
 } from './services/weatherService';
@@ -30,15 +29,27 @@ function App() {
       const { latitude: lat, longitude: lon, name, country } = location;
 
       // 2. Fetch all data in parallel
-      const [current, advanced, marine] = await Promise.all([
-        getCurrentWeather(query),  // From Weatherstack
+      const [advanced, marine] = await Promise.all([
         getForecastAndHistorical(lat, lon), // From Open-Meteo
         getMarineWeather(lat, lon) // From Open-Meteo
       ]);
 
+      // 3. Map Open-Meteo data to replace the HTTP-only Weatherstack data
+      const now = new Date();
+      // Find the closest hourly index for current humidity
+      const currentHourlyIndex = advanced.hourly.time.findIndex(t => new Date(t) > now) || 0;
+
+      const current = {
+        temperature: advanced.current_weather.temperature,
+        wind_speed: advanced.current_weather.windspeed,
+        wind_dir: advanced.current_weather.winddirection,
+        humidity: advanced.hourly.relative_humidity_2m[Math.max(0, currentHourlyIndex - 1)],
+        precip: advanced.daily.precipitation_sum[7] || 0 // Today's precip sum
+      };
+
       setWeatherData({
         location: { name, country, lat, lon },
-        current: current.current,
+        current: current,
         forecast: advanced.daily,
         hourly: advanced.hourly,
         marine: marine.hourly,
