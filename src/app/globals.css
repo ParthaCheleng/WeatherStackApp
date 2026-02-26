@@ -1,0 +1,72 @@
+@import "tailwindcss";
+
+@theme inline {
+  /* Dynamic Background Colors */
+  --color-brand-900: #020617;
+  /* Slate 950 */
+  --color-brand-800: #0f172a;
+  /* Slate 900 */
+  --color-brand-500: #3b82f6;
+  /* Blue 500 */
+
+  /* Glassmorphism Variables */
+  --color-glass-base: rgba(255, 255, 255, 0.05);
+  --color-glass-highlight: rgba(255, 255, 255, 0.1);
+  --color-glass-border: rgba(255, 255, 255, 0.08);
+  --color-glass-strong: rgba(255, 255, 255, 0.15);
+
+  /* Animation Overrides */
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-pulse-slow: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+
+  @keyframes float {
+
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+}
+
+:root {
+  --background: #ffffff;
+  --foreground: #020617;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #020617;
+    /* Deep brand slate */
+    --foreground: #f8fafc;
+  }
+}
+
+@layer base {
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    @apply antialiased min-h-screen selection:bg-brand-500/30 selection:text-white;
+  }
+}
+
+/* Glass Utility Classes directly applied if needed or used via Tailwind @apply */
+@layer components {
+  .glass-panel {
+    @apply bg-glass-base backdrop-blur-xl border border-glass-border rounded-2xl relative overflow-hidden;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  }
+
+  .glass-panel::before {
+    content: '';
+    @apply absolute inset-0 bg-gradient-to-br from-white/[0.08] to-transparent pointer-events-none;
+  }
+
+  /* Thin highlight border for the top/left to simulate lighting on glass */
+  .glass-panel-highlight {
+    box-shadow: inset 1px 1px 1px rgba(255, 255, 255, 0.1);
+  }
+}
